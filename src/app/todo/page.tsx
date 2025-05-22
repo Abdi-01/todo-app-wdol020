@@ -1,13 +1,81 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 
+interface ITodo {
+  id: number;
+  task: string;
+  isDone: boolean;
+}
+
 const TodoPage = () => {
+
+  const inputTaskRef = useRef<HTMLInputElement>(null); // mengakses informasi suatu element seperti document.getElement
+
+  const [todos, setTodos] = useState<ITodo[]>([]); // penampung seluruh data todo
+
+  const onBtDelete = (id: number) => {
+    // Cari index berdasarkan parameter id
+    const selectedIdx = todos.findIndex((value: ITodo) => value.id === id);
+    const temp: ITodo[] = [...todos];
+    temp.splice(selectedIdx, 1);
+    setTodos(temp);
+  }
+
+  const onBtIsDone = (id: number) => {
+    // Cari index berdasarkan parameter id
+    const selectedIdx = todos.findIndex((value: ITodo) => value.id === id);
+    // melakukan reassign value pada property isDone berdasarkan index yang ditemukan
+    // 1. Menyalin data dari todos ke variable sementara
+    const temp: ITodo[] = [...todos];
+    // 2. Me-reassign nilai dari property isDone berdasarkan variable sementara
+    temp[selectedIdx].isDone = !temp[selectedIdx].isDone;
+    // 3. Menyimpan data dari variable sementara ke state todos dengan setTodos 
+    setTodos(temp);
+  }
+
+  const onBtAdd = () => {
+    // Memastikan apakah form input sudah diisi
+    if (inputTaskRef.current?.value) {
+      // Jika ada, tambahkan ke penampung data
+      setTodos([...todos, {
+        id: todos[todos.length - 1] ? todos[todos.length - 1].id + 1 : 1,
+        task: inputTaskRef.current.value,
+        isDone: false
+      }]);
+
+      // reset form input
+      inputTaskRef.current.value = "";
+    } else {
+      // Jika tidak ada, berikan peringatan
+      alert("Jangan biarkan form input kosong");
+    }
+  }
+
+  const printTodo = () => {
+    return todos.map((value: ITodo, index: number) => {
+      return <li className="flex items-center justify-between border-b p-2 hover:shadow-md">
+        <div className="flex items-center gap-4">
+          <Checkbox
+            checked={value.isDone}
+            className="rounded-full w-6 h-6 border-2 border-gray-400 cursor-pointer"
+            onClick={() => onBtIsDone(value.id)}
+          />
+          <span>{value.task}</span>
+        </div>
+        <Button type="button"
+          className="rounded-full p-0 w-8 h-8 bg-red-500 cursor-pointer"
+          onClick={() => onBtDelete(value.id)}>
+          <Trash size={24} />
+        </Button>
+      </li>
+    })
+  }
 
   return (
     <div>
@@ -47,10 +115,12 @@ const TodoPage = () => {
                 type="text"
                 placeholder="Create a new todo..."
                 className="py-6 border-none shadow-none"
+                ref={inputTaskRef}
               />
               <Button
                 type="button"
-                className="absolute top-1/7 right-4"
+                className="absolute top-1/7 right-4 cursor-pointer"
+                onClick={onBtAdd}
               >
                 Add Task
               </Button>
@@ -60,10 +130,12 @@ const TodoPage = () => {
 
         <Card className="w-full mt-4 shadow-lg">
           <CardContent className="p-5">
-
+            <ul>
+              {printTodo()}
+            </ul>
             <div className="flex justify-between text-sm text-gray-500 mt-4">
               <span>
-                0     items left
+                {todos.filter((value: ITodo) => value.isDone === false).length} items left
               </span>
               <div className="space-x-3">
                 <Button
