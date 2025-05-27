@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import StyleModeProvider from "@/contexts/StyleModeContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,9 +28,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="font-[family-name:var(--font-geist-mono)]">
-          {children}
-        </div>
+        <StyleModeProvider>
+          <div className="font-[family-name:var(--font-geist-mono)]">
+            {children}
+          </div>
+        </StyleModeProvider>
       </body>
     </html>
   );

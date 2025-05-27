@@ -1,11 +1,13 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useContext } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { apiCall } from "../../utils/apiHelper"
+import { StyleModeContext } from "@/contexts/StyleModeContext";
 
 interface ITodo {
   id: number;
@@ -17,6 +19,9 @@ interface ITodo {
 const TodoPage = () => {
   const inputTaskRef = useRef<HTMLInputElement>(null); // mengakses informasi suatu element seperti document.getElement
 
+  // Access global data from context
+  const { mode, setMode } = useContext(StyleModeContext);
+
   const [todos, setTodos] = useState<ITodo[]>([]); // penampung seluruh data todo
 
   const onBtDelete = async (objectId: string) => {
@@ -26,12 +31,7 @@ const TodoPage = () => {
     // temp.splice(selectedIdx, 1);
     // setTodos(temp);
     try {
-      await fetch(
-        `https://properlettuce-us.backendless.app/api/data/todo/${objectId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      await apiCall.delete(`/api/data/todo/${objectId}`);
 
       fetchTodoList();
     } catch (err: any) {
@@ -42,19 +42,16 @@ const TodoPage = () => {
   const onBtIsDone = async (objectId: string) => {
     try {
       // const selectedIdx = todos.findIndex((value: ITodo) => value.id === id);
-      // // melakukan reassign value pada property isDone berdasarkan index yang ditemukan
-      // // 1. Menyalin data dari todos ke variable sementara
+      // melakukan reassign value pada property isDone berdasarkan index yang ditemukan
+      // 1. Menyalin data dari todos ke variable sementara
       // const temp: ITodo[] = [...todos];
-      // // 2. Me-reassign nilai dari property isDone berdasarkan variable sementara
+      // 2. Me-reassign nilai dari property isDone berdasarkan variable sementara
       // temp[selectedIdx].isDone = !temp[selectedIdx].isDone;
-      // // 3. Menyimpan data dari variable sementara ke state todos dengan setTodos
+      // 3. Menyimpan data dari variable sementara ke state todos dengan setTodos
       // setTodos(temp);
-      await fetch(
-        `https://properlettuce-us.backendless.app/api/data/todo/${objectId}`,
-        {
-          method: "PUT",
-          body: JSON.stringify({ isDone: true }),
-        }
+      await apiCall.put(
+        `api/data/todo/${objectId}`,
+        { isDone: true }
       );
 
       fetchTodoList();
@@ -78,9 +75,8 @@ const TodoPage = () => {
         //   },
         // ]);
 
-        await fetch("https://properlettuce-us.backendless.app/api/data/todo", {
-          method: "POST",
-          body: JSON.stringify({ task: inputTaskRef.current.value }),
+        await apiCall.post("/api/data/todo", {
+          task: inputTaskRef.current.value
         });
 
         // reset form input
@@ -128,15 +124,11 @@ const TodoPage = () => {
 
   const fetchTodoList = async () => {
     try {
-      const response = await fetch(
-        "https://properlettuce-us.backendless.app/api/data/todo"
-      );
+      const todo = await apiCall.get("/api/data/todo");
 
-      if (response.statusText != "OK") throw new Error(response.statusText);
+      if (todo.statusText != "OK") throw new Error(todo.statusText);
 
-      const parse = await response.json();
-
-      setTodos(parse);
+      setTodos(todo.data);
     } catch (err: any) {
       alert(err?.message);
     }
@@ -163,15 +155,14 @@ const TodoPage = () => {
             variant="ghost"
             size="icon"
             type="button"
-            onClick={() => {
-              if (localStorage.getItem("mode") === "light") {
-                localStorage.setItem("mode", "dark");
-              } else {
-                localStorage.setItem("mode", "light");
-              }
-            }}
+            onClick={() => setMode(mode === "light" ? "dark" : "light")}
           >
-            <Moon size={24} />
+            {
+              mode === "light" ?
+                <Sun size={24} />
+                :
+                <Moon size={24} />
+            }
           </Button>
         </div>
       </div>

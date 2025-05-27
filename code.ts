@@ -1,24 +1,11 @@
-const todo = {
-    id: 1,
-    task: "makan",
-    isDone: false
-}
+// SYNCRONOUS
+console.log("Console 01")
+console.log("Console 02")
+console.log("Console 03")
 
-const newTodo = { ...todo };
-
-
-newTodo.task = "Tidur"
-console.log(todo);
-console.log(newTodo);
-
-
-
-// 
-let age = 20;
-let newAge = age;
-
-console.log(age);
-newAge = 30
-console.log(newAge);
-console.log(age);
-
+// ASYNCRONOUS
+console.log("Console 01")
+setTimeout(() => {
+    console.log("Console 02")
+}, 5000)
+console.log("Console 03")
