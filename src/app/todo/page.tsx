@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { apiCall } from "../../utils/apiHelper"
 import { StyleModeContext } from "@/contexts/StyleModeContext";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hook";
+import { setMode } from "@/lib/redux/features/styleModeSlice";
 
 interface ITodo {
   id: number;
@@ -20,7 +22,16 @@ const TodoPage = () => {
   const inputTaskRef = useRef<HTMLInputElement>(null); // mengakses informasi suatu element seperti document.getElement
 
   // Access global data from context
-  const { mode, setMode } = useContext(StyleModeContext);
+  // const { mode, setMode } = useContext(StyleModeContext);
+
+  // Access global data from redux reducer
+  // Mengambil data dari state reducer styleMode
+  const mode = useAppSelector((state) => {
+    return state.styleModeReducer.mode;
+  })
+  // Menjalankan fungsi action
+  const dispatch = useAppDispatch();
+
 
   const [todos, setTodos] = useState<ITodo[]>([]); // penampung seluruh data todo
 
@@ -155,7 +166,7 @@ const TodoPage = () => {
             variant="ghost"
             size="icon"
             type="button"
-            onClick={() => setMode(mode === "light" ? "dark" : "light")}
+            onClick={() => dispatch(setMode())}
           >
             {
               mode === "light" ?
