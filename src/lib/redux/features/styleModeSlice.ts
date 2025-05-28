@@ -13,12 +13,8 @@ export const styleModeSlice = createSlice({
     initialState,
     reducers: {
         // define object methode for modify data in reducer
-        setMode: (state) => {
-            if (state.mode === "light") {
-                state.mode = "dark"
-            } else {
-                state.mode = "light"
-            }
+        setMode: (state, action) => {
+            state.mode = action.payload;
         }
     }
 });

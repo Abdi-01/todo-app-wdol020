@@ -166,7 +166,7 @@ const TodoPage = () => {
             variant="ghost"
             size="icon"
             type="button"
-            onClick={() => dispatch(setMode())}
+            onClick={() => dispatch(setMode(mode === "light" ? "dark" : "light"))}
           >
             {
               mode === "light" ?

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import StyleModeProvider from "@/contexts/StyleModeContext";
 import StoreProvider from "./StoreProvider";
+import { ToastContainer } from "react-toastify";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,6 +32,7 @@ export default function RootLayout({
       >
         <StoreProvider>
           <StyleModeProvider>
+            <ToastContainer />
             <div className="font-[family-name:var(--font-geist-mono)]">
               {children}
             </div>
