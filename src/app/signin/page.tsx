@@ -8,9 +8,13 @@ import { useRef } from "react";
 import { apiCall } from "@/utils/apiHelper";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { useAppDispatch } from "@/lib/redux/hook";
+import { setSignIn } from "@/lib/redux/features/authSlice";
 
 const SignIn = () => {
   const router = useRouter();
+  const dispatch = useAppDispatch(); // declare dispatch function for execute action
+
   const inputEmailRef = useRef<HTMLInputElement>(null);
   const inputPasswordRef = useRef<HTMLInputElement>(null);
 
@@ -36,10 +40,18 @@ const SignIn = () => {
           }
         });
         console.log(response.data);
-
+        if (response.data.length === 0) {
+          throw new Error("Signin gagal");
+        }
+        // Menyimpan ke globalState
+        dispatch(setSignIn({
+          firstname: response.data[0].firstname,
+          lastname: response.data[0].lastname,
+          email: response.data[0].email,
+          objectId: response.data[0].objectId,
+        }))
         router.replace("/")
         toast(`Signin berhasil`);
-
       } else {
         // - Jika salah satu tidak terpenuhi maka diinfokan registrasi gagal
         throw "Isi semua form";
