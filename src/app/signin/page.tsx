@@ -43,8 +43,16 @@ const SignIn = () => {
         if (response.data.length === 0) {
           throw new Error("Signin gagal");
         }
-        // Menyimpan ke globalState
+        // Menyimpan ke globalState redux
         dispatch(setSignIn({
+          firstname: response.data[0].firstname,
+          lastname: response.data[0].lastname,
+          email: response.data[0].email,
+          objectId: response.data[0].objectId,
+        }))
+
+        // Menyimpan ke localStorage
+        localStorage.setItem("auth", JSON.stringify({
           firstname: response.data[0].firstname,
           lastname: response.data[0].lastname,
           email: response.data[0].email,
