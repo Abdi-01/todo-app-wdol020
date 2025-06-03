@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useContext } from "react";
+import { useRef, useState, useEffect, useContext, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, Trash } from "lucide-react";
@@ -10,6 +10,7 @@ import { apiCall } from "../../utils/apiHelper"
 import { StyleModeContext } from "@/contexts/StyleModeContext";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hook";
 import { setMode } from "@/lib/redux/features/styleModeSlice";
+import Link from "next/link";
 
 interface ITodo {
   id: number;
@@ -34,6 +35,7 @@ const TodoPage = () => {
 
 
   const [todos, setTodos] = useState<ITodo[]>([]); // penampung seluruh data todo
+  const [filter, setFilter] = useState<'all' | 'done' | 'notyet'>('all'); // data state untuk acuan filter
 
   const onBtDelete = async (objectId: string) => {
     // Cari index berdasarkan parameter id
@@ -103,10 +105,21 @@ const TodoPage = () => {
     }
   };
 
+  const filteredTodos = useMemo(() => {
+    return todos.filter((todo: ITodo) => {
+      if (filter === 'done') {
+        return todo.isDone;
+      } else if (filter === "notyet") {
+        return !todo.isDone
+      }
+      return true;
+    })
+  }, [filter, todos]);
+
   const printTodo = () => {
     return (
       todos.length > 0 &&
-      todos.map((value: ITodo, index: number) => {
+      filteredTodos.map((value: ITodo, index: number) => {
         return (
           <li
             className="flex items-center justify-between border-b p-2 hover:shadow-md"
@@ -118,7 +131,9 @@ const TodoPage = () => {
                 className="rounded-full w-6 h-6 border-2 border-gray-400 cursor-pointer"
                 onClick={() => onBtIsDone(value.objectId)}
               />
-              <span>{value.task}</span>
+              <Link href={`/todo/${value.objectId}`}>
+                <span>{value.task}</span>
+              </Link>
             </div>
             <Button
               type="button"
@@ -132,6 +147,8 @@ const TodoPage = () => {
       })
     );
   };
+
+
 
   const fetchTodoList = async () => {
     try {
@@ -148,6 +165,8 @@ const TodoPage = () => {
   useEffect(() => {
     fetchTodoList();
   }, []);
+
+
 
   return (
     <div>
@@ -209,13 +228,13 @@ const TodoPage = () => {
                 items left
               </span>
               <div className="space-x-3">
-                <Button variant="link" type="button">
+                <Button variant="link" type="button" onClick={() => setFilter("all")}>
                   All
                 </Button>
-                <Button variant="link" type="button">
+                <Button variant="link" type="button" onClick={() => setFilter("done")}>
                   Done
                 </Button>
-                <Button variant="link" type="button">
+                <Button variant="link" type="button" onClick={() => setFilter("notyet")}>
                   Not Yet
                 </Button>
               </div>

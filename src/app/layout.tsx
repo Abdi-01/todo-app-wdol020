@@ -25,6 +25,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log("RENDER SERVER");
+
   return (
     <html lang="en">
       <body
